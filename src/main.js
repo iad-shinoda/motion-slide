@@ -20,10 +20,16 @@ async function init() {
 
             const slideDiv = document.createElement('div');
             slideDiv.classList.add('slide');
-            slideDiv.innerHTML = content;
+
+            // Create a wrapper for content to allow accurate scaling
+            const contentWrapper = document.createElement('div');
+            contentWrapper.classList.add('slide-content');
+            contentWrapper.innerHTML = content;
+
+            slideDiv.appendChild(contentWrapper);
 
             // Apply motion typography to text nodes
-            applyMotionTypography(slideDiv);
+            applyMotionTypography(contentWrapper);
 
             slideContainer.appendChild(slideDiv);
             slides.push(slideDiv);
@@ -104,22 +110,27 @@ function nextSlide() {
 function fitSlideToScreen(slide) {
     if (!slide) return;
 
-    // Reset scale to measure natural size
-    slide.style.transform = 'scale(1)';
+    const content = slide.querySelector('.slide-content');
+    if (!content) return;
 
-    const padding = 100; // Safety padding (increased for better fit)
+    // Reset scale to measure natural size
+    content.style.transform = 'scale(1)';
+
+    const padding = 60; // Safety padding
     const w = window.innerWidth - padding;
     const h = window.innerHeight - padding;
-    const slideH = slide.scrollHeight;
-    const slideW = slide.scrollWidth;
+
+    // Measure the content size
+    const contentH = content.offsetHeight;
+    const contentW = content.offsetWidth;
 
     // Check if scaling is needed
-    if (slideH > h || slideW > w) {
-        const scaleH = h / slideH;
-        const scaleW = w / slideW;
+    if (contentH > h || contentW > w) {
+        const scaleH = h / contentH;
+        const scaleW = w / contentW;
         const scale = Math.min(scaleH, scaleW); // Fit to the most constrained dimension
 
-        slide.style.transform = `scale(${scale})`;
+        content.style.transform = `scale(${scale})`;
     }
 }
 
